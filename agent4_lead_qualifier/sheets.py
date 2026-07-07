@@ -46,15 +46,17 @@ class LeadsSheet:
         return self._spreadsheet
 
     def get_referral_link(self, channel: str) -> str:
+        # Covers the worksheet lookup AND get_all_records() below - a
+        # malformed header row (blank/duplicate column name) in the "Links"
+        # tab raises from get_all_records(), not just from the lookup, and
+        # this must never crash the qualification flow either way.
         try:
             worksheet = self._get_spreadsheet().worksheet("Links")
+            for row in worksheet.get_all_records():
+                if str(row.get("channel", "")).strip().lower() == channel.lower():
+                    return str(row.get("referral_link") or DEFAULT_REFERRAL_LINK)
         except Exception:
             logger.exception("Could not read the 'Links' worksheet, falling back to default link")
-            return DEFAULT_REFERRAL_LINK
-
-        for row in worksheet.get_all_records():
-            if str(row.get("channel", "")).strip().lower() == channel.lower():
-                return str(row.get("referral_link") or DEFAULT_REFERRAL_LINK)
         return DEFAULT_REFERRAL_LINK
 
     def append_lead(

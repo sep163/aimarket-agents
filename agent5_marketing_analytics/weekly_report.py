@@ -148,9 +148,23 @@ async def generate_weekly_summary() -> str:
 
 
 async def send_weekly_report() -> None:
-    summary = await generate_weekly_summary()
+    # This job runs unattended (Sundays 09:00 via scheduler_service.py).
+    # APScheduler swallows exceptions from scheduled jobs silently by
+    # default, so a DB/LLM failure here must not disappear into the log
+    # file alone - try to notify the manager chat with a short failure
+    # notice instead of just raising.
     bot = Bot(token=settings.agent5_bot_token)
     try:
+        try:
+            summary = await generate_weekly_summary()
+        except Exception:
+            logger.exception("Failed to generate the weekly summary")
+            await bot.send_message(
+                chat_id=settings.report_chat_id,
+                text="Не получилось сформировать еженедельный отчёт, проверьте логи сервиса.",
+            )
+            return
+
         await bot.send_message(chat_id=settings.report_chat_id, text=summary)
     finally:
         await bot.session.close()
