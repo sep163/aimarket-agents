@@ -1,0 +1,16 @@
+[Unit]
+Description=AImarket Agent 5 - daily sync + weekly report scheduler
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/aimarket-agents
+EnvironmentFile=/opt/aimarket-agents/.env
+ExecStart=/opt/aimarket-agents/venv/bin/python -m agent5_marketing_analytics.scheduler_service
+Restart=on-failure
+RestartSec=5
+User=aimarket
+
+[Install]
+WantedBy=multi-user.target

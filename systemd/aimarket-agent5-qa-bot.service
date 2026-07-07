@@ -1,0 +1,16 @@
+[Unit]
+Description=AImarket Agent 5 - Telegram Q&A bot for marketing metrics
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/aimarket-agents
+EnvironmentFile=/opt/aimarket-agents/.env
+ExecStart=/opt/aimarket-agents/venv/bin/python -m agent5_marketing_analytics.qa_bot
+Restart=on-failure
+RestartSec=5
+User=aimarket
+
+[Install]
+WantedBy=multi-user.target
