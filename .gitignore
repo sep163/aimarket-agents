@@ -4,3 +4,5 @@ __pycache__/
 .env
 service_account.json
 .pytest_cache/
+*.session
+*.session-journal

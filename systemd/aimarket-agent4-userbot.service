@@ -1,0 +1,22 @@
+[Unit]
+Description=AImarket Agent 4 - Telegram userbot lead qualifier (personal account)
+After=network-online.target
+Wants=network-online.target
+
+# Do not enable this until the .session file already exists in
+# /opt/aimarket-agents (created by a one-time interactive login, see
+# agent4_lead_qualifier/userbot.py docstring and README). Without it,
+# Telethon has nothing to authenticate with and the service will just
+# crash-loop asking for a phone code it can never receive non-interactively.
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/aimarket-agents
+EnvironmentFile=/opt/aimarket-agents/.env
+ExecStart=/opt/aimarket-agents/venv/bin/python -m agent4_lead_qualifier.userbot
+Restart=on-failure
+RestartSec=5
+User=aimarket
+
+[Install]
+WantedBy=multi-user.target
